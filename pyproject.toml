@@ -1,0 +1,26 @@
+[project]
+name = "lcss2026-structured-rcbf-margin"
+version = "1.0.0"
+description = "Code for 'Minimal Robust Safety Margins Under Parametric Environment Uncertainty: Interaction-Aware Control Barrier Functions' (IEEE L-CSS 2026): the car-following case study of Section V"
+readme = "ReadMe.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+authors = [
+    {name = "Chaozhe R. He"},
+    {name = "Tamas G. Molnar"},
+]
+dependencies = [
+    "numpy>=1.21",
+    "matplotlib>=3.5",
+]
+
+[project.optional-dependencies]
+test = ["scipy>=1.7"]       # the dual-LP cross-check of tests/test_margin_duality.py (skipped without it)
+
+[tool.uv]
+# uv.lock keeps the matplotlib series that drew the committed figures; later series move the tight
+# bounding box by a few pixels (same content).
+constraint-dependencies = ["matplotlib<3.10"]
+
+[tool.setuptools]
+py-modules = ["params", "model", "simulate", "certify", "generate_results", "stats", "plotter", "run_all"]
