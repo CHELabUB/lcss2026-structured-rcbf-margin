@@ -36,7 +36,7 @@ the operating set.
 | `params.py` | every constant of Section V, with the paper's symbols |
 | `model.py` | policy `pi_E`, regressor `Phi`, barrier `H`, margins `eta_str`, `eta_sd`, `eta_cl`, bounds `u_H`, `u_B`, the two priority rules, the residual `D` and its Lipschitz constants |
 | `simulate.py` | forward-Euler closed loop for `n >= 1` followers, free maneuver or mandatory stop |
-| `certify.py` | `rho*_Omega` versus the depth `eps` of `Omega` for each `gamma_-`, as the ratio infimum of eq. (rhostar) on a grid of the operating set; `rho*_S` also by bisection with the Lipschitz certificate; sharpness state; `gamma_-` threshold |
+| `certify.py` | `rho*_Omega` versus the depth `eps` of `Omega` for each `gamma_-`, as the ratio infimum of eq. (rhostar) on a grid of the operating set; `rho*_S` also by bisection on the sign of the grid minimum, plus the certified lower bound of the Remark on computation (Lipschitz constants times the grid spacing); sharpness state; `gamma_-` threshold |
 | `generate_results.py` | runs everything, writes `results/runs.npz` and `results/results.json` |
 | `stats.py` | prints every quoted number next to the value in the paper, PASS / FAIL |
 | `plotter.py` | Fig. 1 (`results/fig1_case_study.png/.pdf`) and, with `--extended`, the extended figures |

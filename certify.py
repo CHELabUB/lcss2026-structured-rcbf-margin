@@ -13,9 +13,10 @@ Omega_eps = {x in X : H(x) >= -eps} are nested, so the sweep over eps bins every
 the smallest eps that contains it and takes running minima over the bins; the grid is visited
 one h-slice at a time (memory stays small at the 0.05 m spacing, 28 million states in X).
 
-Also: rho*_S by bisection with the Lipschitz certificate of the Remark on computation (a check
-that brackets the ratio infimum), the sharpness state of the Corollary on feasibility, and the
-threshold on gamma_- below which rho*_X = rho*_S.
+Also: rho*_S by bisection on the sign of min_S D(rho) (Remark on computation), a check that brackets
+the ratio infimum; the certified lower bound of the Remark, min_Omega D(rho) >= min_grid D(rho) -
+(Lipschitz constants x grid spacing), as `certified_lower_bound`; the sharpness state of the
+Corollary on feasibility; and the threshold on gamma_- below which rho*_X = rho*_S.
 """
 import numpy as np
 
@@ -170,8 +171,13 @@ def bisection(front, bracket=p.rho_bracket, tol=p.rho_tol):
 
 
 def lipschitz_slack(dh, dv):
-    """min_Omega D(rho) >= min_grid D(rho) - (s0 + s1 rho) with s(rho) = (L_h dh + (L_vA + L_vE) dv) / 2."""
-    s = lambda L: 0.5 * (L[0] * dh + (L[1] + L[2]) * dv)
+    """min_Omega D(rho) >= min_grid D(rho) - (s0 + s1 rho) with s(rho) = L_h dh + (L_vA + L_vE) dv.
+
+    Every x in Omega_eps has a grid point of Omega_eps within one step per axis: round h and v_A up
+    and v_E down (H does not decrease, v_E - v_A does not increase, and h_max, v_max are grid points),
+    so the Lipschitz constants times the full spacing bound the gap between the grid minimum and the
+    infimum over the set."""
+    s = lambda L: L[0] * dh + (L[1] + L[2]) * dv
     s_0 = s(m.lipschitz_constants(0.0))
     return float(s_0), float(s(m.lipschitz_constants(1.0)) - s_0)
 

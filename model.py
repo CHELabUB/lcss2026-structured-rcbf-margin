@@ -168,7 +168,7 @@ def residual_terms(h, vA, vE, dtheta_0=p.dtheta):
     Returns (H, sup_u a, psi^T dtheta_0) with psi = tau |Phi| for the one-follower regressor."""
     P1, P2 = V(h) - vE, W(vA) - vE
     Hval = H(h, vA, vE)
-    sup = (vA - vE) + p.tau * p.u_max - p.tau * (P1 * p.theta_hat[0] + P2 * p.theta_hat[1])
+    sup = sup_a(h, vA, vE, np.column_stack([P1, P2]))
     psi_d = p.tau * (np.abs(P1) * dtheta_0[0] + np.abs(P2) * dtheta_0[1])
     return Hval, sup, psi_d
 
@@ -176,13 +176,15 @@ def residual_terms(h, vA, vE, dtheta_0=p.dtheta):
 def lipschitz_constants(rho, gamma_minus=p.gamma):
     """Per-axis Lipschitz constants of x -> D(x; rho dtheta_0) on X (Remark on computation).
 
-    V' in {0, kappa}, W' in {0, 1}; the alpha term contributes at most max(gamma, gamma_minus),
-    so for gamma_minus <= gamma the constants of alpha(H) = gamma H apply."""
+    D = (v_A - v_E) + tau u_max - tau (theta_1 P_1 + theta_2 P_2) + alpha(H) - rho tau (|P_1| dtheta_1 + |P_2| dtheta_2)
+    with P_1 = V(h) - v_E, P_2 = W(v_A) - v_E, V' in {0, kappa}, W' in {0, 1}, dH = (1, tau, -tau), and the
+    alpha term contributes at most max(gamma, gamma_minus).  Along v_E the first three terms are affine
+    with slope -1 + tau (theta_1 + theta_2), so that slope enters as one constant."""
     g = max(p.gamma, gamma_minus)
     t, k = p.tau, p.kappa
     d1, d2 = p.dtheta
     th1, th2 = p.theta_hat
     L_h = k * t * (th1 + rho * d1) + g
     L_vA = 1.0 + t * th2 + g * t + rho * t * d2
-    L_vE = 1.0 + t * (th1 + th2) + g * t + rho * t * (d1 + d2)
+    L_vE = abs(-1.0 + t * (th1 + th2)) + g * t + rho * t * (d1 + d2)
     return L_h, L_vA, L_vE

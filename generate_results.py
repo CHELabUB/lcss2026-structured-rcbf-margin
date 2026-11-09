@@ -47,7 +47,9 @@ def main():
         "dtheta": p.dtheta.tolist(), "L": p.L, "d_min": p.d_min, "tau": p.tau, "gamma": p.gamma,
         "U": [p.u_min, p.u_max], "K_p": p.K_p, "dt": p.dt, "T": p.T, "s_line": p.s_line, "a_b": p.a_b,
         "gamma_s": p.gamma_s, "theta_a": p.theta_a.tolist(), "theta_vertex": p.theta_vertex.tolist(),
-        "seed": p.seed, "gap_0": p.gap_0}}
+        "seed": p.seed, "gap_0": p.gap_0, "t_step": p.t_step, "v_ref_0": p.v_ref_0, "t_mean": p.t_mean,
+        "v_ref_sweep": p.v_ref_sweep.tolist(), "h_max": p.h_max, "w_max": p.w_max,
+        "rho_sharpness": p.rho_sharpness, "n_list": list(p.n_list)}}
 
     # --- Setup: delta_bar, initial condition, Assumption on nominal safety
     R["setup"] = {"delta_bar": m.delta_bar(1), "eta_cl": m.eta_cl(1), "h_0": p.h_0(),
@@ -69,7 +71,7 @@ def main():
     # --- Fig. 1(b): H for the vertices and samples of Theta under each margin
     thetas = sim.theta_samples()
     Z["b/theta"] = thetas
-    R["b"] = {}
+    R["b"] = {"n_theta": int(len(thetas))}
     for mg in ("none", "str", "cl"):
         Hs = np.stack([sim.simulate(th, mg)["H"] for th in thetas])
         Z[f"b/{mg}/H"] = Hs

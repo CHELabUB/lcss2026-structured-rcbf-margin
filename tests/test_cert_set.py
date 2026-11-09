@@ -97,9 +97,10 @@ class TestCertifyCoarse(unittest.TestCase):
         self.assertTrue(close_to_printed(max(v["rho_star"][-1] for v in self.single.values()), M.SINGLE_MAX_RHO_STAR_X))
 
     def test_lipschitz_constants(self):
-        np.testing.assert_allclose(m.lipschitz_constants(0.0), (0.74, 2.0, 2.4))
+        np.testing.assert_allclose(m.lipschitz_constants(0.0), (0.74, 2.0, 0.6))
         s0, s1 = certify.lipschitz_slack(0.05, 0.05)
-        self.assertAlmostEqual(s0, 0.1285)
+        self.assertAlmostEqual(s0, 0.167)                       # (0.74 + 2.0 + 0.6) x 0.05
+        self.assertAlmostEqual(s1, (0.6 * 0.12 + 0.15 + 0.27) * 0.05)
         self.assertGreater(s1, 0.0)
 
     def test_pareto_front_and_bisection_equal_brute_force(self):

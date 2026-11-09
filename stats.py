@@ -32,8 +32,20 @@ def rows(R):
     sd = q["stop"]["sd"]
     cl = q["stop"]["cl"]
     ge = R["gains"]["n"]
+    P = R["params"]
+    sweep = P["v_ref_sweep"]
     out = [
         ("Setup", None, None),
+        ("K_p [1/s], v_ref_0 [m/s], step at t [s]", (P["K_p"], P["v_ref_0"], P["t_step"]), (M.K_P, M.V_REF_0, M.T_STEP)),
+        ("Euler step dt [s], horizon T [s]", (P["dt"], P["T"]), (M.DT, M.T_SIM)),
+        ("vehicle length L [m] (cancels in every gap)", P["L"], P["L"] == 5.0),
+        ("thetas in Fig. 1(b): 4 vertices + 20 samples", R["b"]["n_theta"], M.N_THETA),
+        ("v_ref sweep of Fig. 1(g): first, last, spacing [m/s]", (sweep[0], sweep[-1], sweep[1] - sweep[0]), M.V_REF_SWEEP),
+        ("v* averaged over the last [s]", P["t_mean"], P["t_mean"] == M.T_MEAN),
+        ("queue: E_2..E_n from rest with gaps of [m]", P["gap_0"], P["gap_0"] == M.QUEUE_GAP_0),
+        ("X: h_max [m], (v_E - v_A)_max [m/s]", (P["h_max"], P["w_max"]), (M.X_H_MAX, M.X_W_MAX)),
+        ("sharpness factor rho / rho*_S", c["sharpness"]["rho"] / c["rho_star_S"]["ratio_infimum"],
+         abs(c["sharpness"]["rho"] / c["rho_star_S"]["ratio_infimum"] - M.SHARPNESS_RHO_FACTOR) < 1e-12),
         ("delta_bar [m/s^2] = eta_cl [m/s]", R["setup"]["delta_bar"], M.DELTA_BAR),
         ("h(0) [m]", R["setup"]["h_0"], M.H0_GAP),
         ("H(0) [m]", R["setup"]["H_0"], M.H0_BARRIER),
@@ -67,6 +79,8 @@ def rows(R):
         ("rho*_S (ratio infimum)", c["rho_star_S"]["ratio_infimum"], M.RHO_STAR_S),
         ("rho*_S (bisection)", c["rho_star_S"]["bisection"], M.RHO_STAR_S),
         ("1 / rho*_S [%]", c["rho_star_S"]["budget_used_percent"], M.BUDGET_USED_PERCENT),
+        ("certified lower bound on rho*_S (Lipschitz x grid spacing) (>= 1)", c["rho_star_S"]["certified_lower_bound"],
+         1.0 <= c["rho_star_S"]["certified_lower_bound"] <= c["rho_star_S"]["ratio_infimum"]),
         ("sharpness state (h, v_A, v_E) on H = 0", tuple(c["sharpness"]["state"]), M.SHARPNESS_STATE),
         ("max_u dot H at 1.2 rho*_S there", c["sharpness"]["sup_Hdot"], M.SHARPNESS_SUP_HDOT),
         ("rho*_Omega at eps = 5, gamma_- = 0.5", one["0.5"]["rho_star"][-1], M.RHO_STAR_X_GAMMA_MINUS_05),
@@ -104,6 +118,8 @@ def rows(R):
         ("eta_cl: infeasible time, n = 10 [s]", cl["infeasible_time"][i10], M.CL_INFEASIBLE_WINDOW_N10),
         ("eta_str: infeasible time, every n [s]", max(q["stop"]["str"]["infeasible_time"]),
          max(q["stop"]["str"]["infeasible_time"]) == 0),
+        ("smallest gap between followers, free maneuver, n >= 2 [m] (> 0)",
+         min(q["h_min_queue_free"][1:]), min(q["h_min_queue_free"][1:]) > 0),
         ("Extended figure E3 (independent gains, followers from rest)", None, None),
         ("peak eta_sd, n = 2 [m/s]", g["eta_sd_peak"][ge.index(2)], M.INDEP_ETA_SD_PEAK_N2),
         ("peak eta_sd, n = 10 [m/s]", g["eta_sd_peak"][ge.index(10)], M.INDEP_ETA_SD_PEAK_N10),

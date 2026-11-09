@@ -6,6 +6,14 @@ half a unit in the last printed digit).  The last block holds the numbers of the
 """
 
 # --- Setup
+K_P = 0.8                           # 1/s, u_d = K_p (v_ref - v_A)
+V_REF_0 = 10.0                      # m/s, both vehicles; v_ref steps to 0 at T_STEP
+T_STEP = 1.0                        # s
+DT, T_SIM = 0.02, 40.0              # s, forward Euler step and horizon
+N_THETA = 24                        # 4 vertices + 20 uniform samples in Fig. 1(b)
+V_REF_SWEEP = (0.5, 4.0, 0.25)      # m/s, Fig. 1(g): first, last, spacing
+T_MEAN = 5.0                        # s, v* is the mean of v_A over the last T_MEAN seconds
+X_H_MAX, X_W_MAX = 30.0, 5.0        # m, m/s: X = {h in [d_min, 30], v in [0, 12]^2, v_E - v_A <= 5}
 DELTA_BAR = "3.24"                  # m/s^2, uniform bound; eta_cl = tau delta_bar = 3.24 m/s
 H0_GAP = "18.67"                    # m, h(0) = h_st + v_ref_0 / kappa
 H0_BARRIER = "17.67"                # m, H(0)
@@ -79,8 +87,11 @@ INDEP_MIN_H_N10 = "-3.0"            # m, for n >= 10
 
 
 def printed_tolerance(printed):
-    """Half a unit in the last place of a printed decimal or one-digit scientific value."""
+    """Half a unit in the last place of a printed decimal or one-digit scientific value; a printed
+    "0" means exactly zero (tolerance 1e-6)."""
     s = printed.strip().lower()
+    if float(s) == 0.0:
+        return 1e-6
     if "e" in s:
         mant, exp = s.split("e")
         digits = len(mant.split(".")[1]) if "." in mant else 0
